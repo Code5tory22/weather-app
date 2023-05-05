@@ -1,34 +1,60 @@
 import axios from "axios";
 import { useState } from "react";
+import states from "../state";
 
 function Form() {
     const [cityInput, SetCityInput] = useState("");
-    const [data, setData] = useState([]);
-
-    const baseUrl = `http://api.openweathermap.org/geo/1.0/direct?q=${cityInput}&limit=10&appid=cb976094aae26290223f2f4101763ee2`
+    const [APIData, setAPIData] = useState([]);
+    const [stateInput, setStateInput] = useState()
+    const appId = 'cb976094aae26290223f2f4101763ee2';
+    
+    const GeoCoordUrl = `http://api.openweathermap.org/geo/1.0/direct?q=${cityInput},${stateInput},us&limit=10&appid=${appId}`;
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.get(baseUrl)
+        if(cityInput === ""){
+            alert("please enter city")
+        }
+        axios.get(GeoCoordUrl)
             .then((response) => {
-                setData(response)
+                setAPIData(response)
             },
                 (error) => {
                     console.log(error)
                 }
             );
         SetCityInput("");
+    };
+
+    const handleSelection = (e) => {
+        setStateInput(e.target.value)
     }
-    console.log(data)
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    console.log(APIData);
+
     return (
-        <form onSubmit={handleSubmit}>
-            <input
-                type="text"
-                onChange={(e) => SetCityInput(e.target.value)}
-                value={cityInput}
-            />
-            <button>Search</button>
-        </form>
+        <div>
+            <form onSubmit={handleSubmit}>
+                <input
+                    type="text"
+                    onChange={(e) => SetCityInput(e.target.value)}
+                    placeholder="Enter a city"
+                    value={cityInput}
+                />
+                <select
+                    onChange={handleSelection}
+                     name="states" 
+                     id="states">
+                     <option>Please choose one</option>
+                    {states.map(state => <option key={state.id} value={state.value}>{state.name}</option>)}
+                </select>
+                <button>Search</button>
+            </form>
+            {/* {APIData.data?.map( city => <li key={city.state}>{city.state}</li> )} */}
+
+        </div>
+
     );
 }
 
